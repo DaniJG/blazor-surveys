@@ -1,0 +1,93 @@
+﻿@page "/add-survey"
+@using BlazorSurveys.Shared
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<EditForm EditContext="@editContext" OnSubmit="@OnSubmit">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+
+  <div class="form-group">
+    <label for="inputTitle">Title</label>
+    <InputText id="inputTitle" class="form-control" @bind-Value="survey.Title" />
+  </div>
+
+  <div class="form-group">
+    <label for="inputMinutes">Minutes</label>
+    <InputNumber id="inputMinutes" class="form-control" @bind-Value="survey.Minutes" />
+  </div>
+
+  @foreach (var option in survey.Options)
+  {
+    <div class="input-group mb-3">
+      <InputText id="inputMinutes" class="form-control" @bind-Value="option.OptionValue" />
+      <div class="input-group-append">
+        <button class="btn btn-outline-primary" type="button" @onclick="@(() => survey.RemoveOption(option))">Remove</button>
+      </div>
+    </div>
+  }
+  <button class="btn btn-primary" type="button" @onclick="@(() => survey.AddOption())"><i class="oi oi-plus" /> Add Option</button>
+
+  <p>
+    <button type="submit" class="btn btn-primary float-right">Submit</button>
+  </p>
+</EditForm>
+
+@code {
+    private SurveyCreateModel survey = new SurveyCreateModel();
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(survey);
+    }
+    private async Task OnSubmit()
+    {
+        if (!editContext.Validate()) return;
+
+        await Http.PostAsJsonAsync<Survey>($"api/survey", new Survey {
+            Title = survey.Title,
+            ExpiresAt = DateTime.Now.AddMinutes(survey.Minutes.Value),
+            Options = survey.Options.Select(o => o.OptionValue).ToList()
+        });
+
+        NavigationManager.NavigateTo("");
+    }
+
+    protected class SurveyCreateModel: IValidatableObject
+    {
+        [Required]
+        [MaxLength(50)]
+        public string Title { get; set; }
+        [Required]
+        public int? Minutes { get; set; }
+        public List<OptionCreateModel> Options { get; set; } = new List<OptionCreateModel>();
+
+        public void RemoveOption(OptionCreateModel option)
+        {
+            this.Options.Remove(option);
+        }
+
+        public void AddOption()
+        {
+            this.Options.Add(new OptionCreateModel());
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (this.Options.Count < 2 )
+            {
+                yield return new ValidationResult("A survey requires at least 2 options.");
+            }
+        }
+    }
+
+    protected class OptionCreateModel
+    {
+        [Required]
+        [MaxLength(20)]
+        public string OptionValue { get; set; }
+    }
+}
