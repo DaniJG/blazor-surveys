@@ -6,19 +6,33 @@
 @inject NavigationManager NavigationManager
 
 <EditForm EditContext="@editContext" OnSubmit="@OnSubmit">
-  <DataAnnotationsValidator />
-  <ValidationSummary />
+  @* <DataAnnotationsValidator /> *@
+  <ObjectGraphDataAnnotationsValidator />
+  <div class="@(editContext.GetValidationMessages().Any() ? "alert alert-danger" : "")">
+    <ValidationSummary class="alert alert-danger" />
+  </div>
 
   <div class="form-group">
     <label for="inputTitle">Title</label>
     <InputText id="inputTitle" class="form-control" @bind-Value="survey.Title" />
+    @if(editContext.GetValidationMessages(() => survey.Title).Any()){
+      <div class="invalid-feedback">
+        @editContext.GetValidationMessages(() => survey.Title).First()
+      </div>
+    }
   </div>
 
   <div class="form-group">
     <label for="inputMinutes">Minutes</label>
     <InputNumber id="inputMinutes" class="form-control" @bind-Value="survey.Minutes" />
+    @if(editContext.GetValidationMessages(() => survey.Minutes).Any()){
+      <div class="invalid-feedback">
+        @editContext.GetValidationMessages(() => survey.Minutes).First()
+      </div>
+    }
   </div>
 
+  <label>Options</label>
   @foreach (var option in survey.Options)
   {
     <div class="input-group mb-3">
@@ -26,9 +40,14 @@
       <div class="input-group-append">
         <button class="btn btn-outline-primary" type="button" @onclick="@(() => survey.RemoveOption(option))">Remove</button>
       </div>
+      @if(editContext.GetValidationMessages(() => option.OptionValue).Any()){
+        <div class="invalid-feedback">
+          @editContext.GetValidationMessages(() => option.OptionValue).First()
+        </div>
+      }
     </div>
   }
-  <button class="btn btn-primary" type="button" @onclick="@(() => survey.AddOption())"><i class="oi oi-plus" /> Add Option</button>
+  <p><button class="btn btn-primary" type="button" @onclick="@(() => survey.AddOption())"><i class="oi oi-plus" /> Add Option</button></p>
 
   <p>
     <button type="submit" class="btn btn-primary float-right">Submit</button>
@@ -42,6 +61,7 @@
     protected override void OnInitialized()
     {
         editContext = new EditContext(survey);
+        editContext.SetFieldCssClassProvider(new BootstrapFieldClassProvider());
     }
     private async Task OnSubmit()
     {
@@ -56,13 +76,14 @@
         NavigationManager.NavigateTo("");
     }
 
-    protected class SurveyCreateModel: IValidatableObject
+    private class SurveyCreateModel: IValidatableObject
     {
         [Required]
         [MaxLength(50)]
         public string Title { get; set; }
         [Required]
         public int? Minutes { get; set; }
+        [ValidateComplexType]
         public List<OptionCreateModel> Options { get; set; } = new List<OptionCreateModel>();
 
         public void RemoveOption(OptionCreateModel option)
@@ -84,10 +105,19 @@
         }
     }
 
-    protected class OptionCreateModel
+    private class OptionCreateModel
     {
         [Required]
         [MaxLength(20)]
         public string OptionValue { get; set; }
+    }
+
+    private class BootstrapFieldClassProvider : FieldCssClassProvider
+    {
+        public override string GetFieldCssClass(EditContext editContext, in FieldIdentifier fieldIdentifier)
+        {
+            var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+            return isValid ? "" : "is-invalid";
+        }
     }
 }
