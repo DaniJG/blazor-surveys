@@ -8,7 +8,7 @@ namespace BlazorSurveys.Server.Hubs
 {
     public interface ISurveyHub
     {
-        Task SurveyAdded(Survey survey);
+        Task SurveyAdded(SurveySummary survey);
         Task SurveyUpdated(Survey survey);
     }
 

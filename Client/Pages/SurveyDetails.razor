@@ -10,15 +10,24 @@
 } else {
   <h1 class="mb-4">@survey.Title</h1>
 
+  <p>Cast your vote by clicking in one of the options below</p>
+
   <ul class="list-group mb-4">
     @foreach (var option in survey.Options)
     {
-      <button @onclick="@(async () => await OnAnswer(option))" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      <button
+        @onclick="@(async () => await OnAnswer(option))"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+      >
         @option
-        <span class="badge badge-primary badge-pill">@(survey.Answers.Where(a => a.Option == option).Count())</span>
+        <span class="badge badge-primary badge-pill">
+          @(survey.Answers.Where(a => a.Option == option).Count())
+        </span>
       </button>
     }
   </ul>
+
+  <SurveyExpiration Expirable=survey class="text-right" />
 }
 
 @code {
@@ -46,6 +55,8 @@
 
     private async Task OnAnswer(string option)
     {
+        if (((IExpirable)survey).IsExpired) return;
+
         await Http.PostAsJsonAsync<SurveyAnswer>($"api/survey/{Id}/answer", new SurveyAnswer{
           Option = option
         });

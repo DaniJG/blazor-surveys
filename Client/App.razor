@@ -17,13 +17,14 @@
 @code {
     private CancellationTokenSource cts = new CancellationTokenSource();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         // launch the signalR connection in the background.
         // Note we dont want to block the rendering of the app until the connection is established
         // nor we want an exception to prevent the entire app from starting
         // Therefore we run it in the background without "await"
         // See: https://docs.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-5.0#handle-errors
+        #pragma warning disable CS4014
         ConnectWithRetryAsync(cts.Token);
 
         // Once initialized the retry logic configured in the HubConnection will automatically attempt to reconnect

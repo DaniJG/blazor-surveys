@@ -11,8 +11,8 @@ using BlazorSurveys.Shared;
 
 namespace BlazorSurveys.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class SurveyController : ControllerBase
     {
         private readonly IHubContext<SurveyHub, ISurveyHub> hubContext;
@@ -59,9 +59,9 @@ namespace BlazorSurveys.Server.Controllers
         }
 
         [HttpGet()]
-        public IEnumerable<Survey> GetSurveys()
+        public IEnumerable<SurveySummary> GetSurveys()
         {
-            return surveys;
+            return surveys.Select(s => s.ToSummary());
         }
 
         [HttpGet("{id}")]
@@ -73,13 +73,19 @@ namespace BlazorSurveys.Server.Controllers
             return new JsonResult(survey);
         }
 
+        // Note an [ApiController] will automatically return a 400 response if any
+        // of the data annotation valiadations defined in AddSurveyModel fails
         [HttpPost()]
-        public async Task<Survey> AddSurvey([FromBody]Survey survey)
+        public async Task<Survey> AddSurvey([FromBody]AddSurveyModel addSurveyModel)
         {
-            survey.Id = Guid.NewGuid();
-            survey.Answers = new List<SurveyAnswer>();
+            var survey = new Survey{
+              Title = addSurveyModel.Title,
+              ExpiresAt = DateTime.Now.AddMinutes(addSurveyModel.Minutes.Value),
+              Options = addSurveyModel.Options.Select(o => o.OptionValue).ToList()
+            };
+
             surveys.Add(survey);
-            await this.hubContext.Clients.All.SurveyAdded(survey);
+            await this.hubContext.Clients.All.SurveyAdded(survey.ToSummary());
             return survey;
         }
 
@@ -88,12 +94,13 @@ namespace BlazorSurveys.Server.Controllers
         {
             var survey = surveys.SingleOrDefault(t => t.Id == surveyId);
             if (survey == null) return NotFound();
-            if (survey.IsExpired) return StatusCode(400, "This survey has expired");
+            if (((IExpirable)survey).IsExpired) return StatusCode(400, "This survey has expired");
 
-            answer.Id = Guid.NewGuid();
-            answer.SurveyId = surveyId;
             // warning, this isnt thread safe since we store answers in a List
-            survey.Answers.Add(answer);
+            survey.Answers.Add(new SurveyAnswer{
+              SurveyId = surveyId,
+              Option = answer.Option
+            });
 
             // Notify anyone connected to the survey group
             // ofc sending the entire survey all the time is inefficient, but enough in this tutorial

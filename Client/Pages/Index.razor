@@ -4,6 +4,7 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject HubConnection HubConnection
+@implements IDisposable
 
 <h1 class="mb-4">Real-Time surveys with Blazor and SignalR</h1>
 
@@ -20,22 +21,9 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">@survey.Title</h5>
-          </div>
-          <ul class="list-group list-group-flush">
-            @foreach (var option in survey.Options)
-            {
-              <li class="list-group-item">@option</li>
-            }
-          </ul>
-          <div class="card-body">
-            <button class="btn btn-primary" @onclick="@(() => GoToSurvey(survey.Id))">View survey</button>
-            <p class="card-text float-right">
-              @if (survey.IsExpired){
-                <strong>Expired</strong>
-              } else {
-                <small class="text-muted">Expires in @(Math.Ceiling(survey.ExpiresAt.Subtract(DateTime.Now).TotalMilliseconds / 60000)) min</small>
-              }
-            </p>
+
+            <button class="btn btn-link pl-0" @onclick="@(() => GoToSurvey(survey.Id))">View survey</button>
+            <SurveyExpiration Expirable=survey class="card-text float-right" />
           </div>
         </div>
       </div>
@@ -46,12 +34,12 @@
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
-    private Survey[] surveys;
+    private SurveySummary[] surveys;
 
     protected override async Task OnInitializedAsync()
     {
-        surveys = await Http.GetFromJsonAsync<Survey[]>("api/survey");
-        HubConnection.On<Survey>("SurveyAdded", survey =>
+        surveys = await Http.GetFromJsonAsync<SurveySummary[]>("api/survey");
+        HubConnection.On<SurveySummary>("SurveyAdded", survey =>
         {
             surveys = surveys
                 .Where(s => s.Title != survey.Title)
@@ -59,6 +47,11 @@
                 .ToArray();
             StateHasChanged();
         });
+    }
+
+    public void Dispose()
+    {
+        HubConnection.Remove("SurveyAdded");
     }
 
     private void AddSurvey()
