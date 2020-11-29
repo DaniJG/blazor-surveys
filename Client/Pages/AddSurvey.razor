@@ -2,7 +2,7 @@
 @using BlazorSurveys.Shared
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Logging
-@inject HttpClient Http
+@inject SurveyHttpClient SurveyHttpClient
 @inject NavigationManager NavigationManager
 @inject ILogger<AddSurvey> Logger
 
@@ -72,7 +72,7 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync<AddSurveyModel>($"api/survey", survey);
+            var response = await SurveyHttpClient.AddSurvey(survey);
             if (response.IsSuccessStatusCode)
             {
                 NavigationManager.NavigateTo("");

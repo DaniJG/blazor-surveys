@@ -1,7 +1,7 @@
 ﻿@page "/survey-details/{Id:guid}"
 @using Microsoft.AspNetCore.SignalR.Client
 @using BlazorSurveys.Shared
-@inject HttpClient Http
+@inject SurveyHttpClient SurveyHttpClient
 @inject HubConnection HubConnection
 @implements IAsyncDisposable
 
@@ -36,7 +36,7 @@
     private Survey survey;
     protected override async Task OnInitializedAsync()
     {
-        survey = await Http.GetFromJsonAsync<Survey>($"api/survey/{Id}");
+        survey = await SurveyHttpClient.GetSurvey(Id);
 
         await HubConnection.InvokeAsync("JoinSurveyGroup", Id);
 
@@ -57,7 +57,7 @@
     {
         if (((IExpirable)survey).IsExpired) return;
 
-        await Http.PostAsJsonAsync<SurveyAnswer>($"api/survey/{Id}/answer", new SurveyAnswer{
+        await SurveyHttpClient.AnswerSurvey(Id, new SurveyAnswer{
           Option = option
         });
     }

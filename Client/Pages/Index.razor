@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.SignalR.Client
 @using BlazorSurveys.Shared
-@inject HttpClient Http
+@inject SurveyHttpClient SurveyHttpClient
 @inject NavigationManager NavigationManager
 @inject HubConnection HubConnection
 @implements IDisposable
@@ -38,7 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        surveys = await Http.GetFromJsonAsync<SurveySummary[]>("api/survey");
+        surveys = await SurveyHttpClient.GetSurveys();
         HubConnection.On<SurveySummary>("SurveyAdded", survey =>
         {
             surveys = surveys

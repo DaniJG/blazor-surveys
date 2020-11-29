@@ -90,7 +90,7 @@ namespace BlazorSurveys.Server.Controllers
         }
 
         [HttpPost("{surveyId}/answer")]
-        public async Task<ActionResult> AddAnswerAsync(Guid surveyId, [FromBody]SurveyAnswer answer)
+        public async Task<ActionResult> AnswerSurvey(Guid surveyId, [FromBody]SurveyAnswer answer)
         {
             var survey = surveys.SingleOrDefault(t => t.Id == surveyId);
             if (survey == null) return NotFound();
