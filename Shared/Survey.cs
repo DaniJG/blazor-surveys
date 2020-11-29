@@ -11,15 +11,12 @@ namespace BlazorSurveys.Shared
         public List<string> Options { get; init; } = new List<string>();
         public List<SurveyAnswer> Answers { get;init; } = new List<SurveyAnswer>();
 
-        public SurveySummary ToSummary()
-        {
-            return new SurveySummary{
-                Id = this.Id,
-                Title = this.Title,
-                Options = this.Options,
-                ExpiresAt = this.ExpiresAt
-            };
-        }
+        public SurveySummary ToSummary() => new SurveySummary{
+            Id = this.Id,
+            Title = this.Title,
+            Options = this.Options,
+            ExpiresAt = this.ExpiresAt
+        };
     }
 
     public record SurveyAnswer

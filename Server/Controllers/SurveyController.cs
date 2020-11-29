@@ -18,39 +18,39 @@ namespace BlazorSurveys.Server.Controllers
         private readonly IHubContext<SurveyHub, ISurveyHub> hubContext;
         private static ConcurrentBag<Survey> surveys = new ConcurrentBag<Survey> {
           new Survey {
-                Id = Guid.Parse("b00c58c0-df00-49ac-ae85-0a135f75e01b"),
-                Title = "Are you excited about .NET 5.0?",
-                ExpiresAt = DateTime.Now.AddMinutes(10),
-                Options = new List<string>{ "Yes!", "Nope", "meh", "PS5 just came out...", "None of the above, I got a series X" },
-                Answers = new List<SurveyAnswer>{
-                  new SurveyAnswer { Option = "Yes" },
-                  new SurveyAnswer { Option = "Yes" },
-                  new SurveyAnswer { Option = "Yes" },
-                  new SurveyAnswer { Option = "Nope" },
-                  new SurveyAnswer { Option = "meh" },
-                  new SurveyAnswer { Option = "meh" },
-                  new SurveyAnswer { Option = "PS5 just came out..." },
-                  new SurveyAnswer { Option = "None of the above, I got a series X" }
-                }
-            },
+              Id = Guid.Parse("b00c58c0-df00-49ac-ae85-0a135f75e01b"),
+              Title = "Are you excited about .NET 5.0?",
+              ExpiresAt = DateTime.Now.AddMinutes(10),
+              Options = new List<string>{ "Yes", "Nope", "meh", "PS5 just came out...", "None of the above, I got a series X" },
+              Answers = new List<SurveyAnswer>{
+                new SurveyAnswer { Option = "Yes" },
+                new SurveyAnswer { Option = "Yes" },
+                new SurveyAnswer { Option = "Yes" },
+                new SurveyAnswer { Option = "Nope" },
+                new SurveyAnswer { Option = "meh" },
+                new SurveyAnswer { Option = "meh" },
+                new SurveyAnswer { Option = "PS5 just came out..." },
+                new SurveyAnswer { Option = "None of the above, I got a series X" }
+              }
+          },
           new Survey {
-                Id = Guid.Parse("7e467e51-9999-427e-bf81-015076b9f24c"),
-                Title = "What's the best food in the world?",
-                ExpiresAt = DateTime.Now.AddMinutes(2),
-                Options = new List<string>{ "Cheese", "Payoyo goat's cheese", "Tortilla", "Jamón", "Soylent!" },
-                Answers = new List<SurveyAnswer>{
-                  new SurveyAnswer { Option = "Cheese" },
-                  new SurveyAnswer { Option = "Cheese" },
-                  new SurveyAnswer { Option = "Payoyo goat's cheese" },
-                  new SurveyAnswer { Option = "Payoyo goat's cheese" },
-                  new SurveyAnswer { Option = "Payoyo goat's cheese" },
-                  new SurveyAnswer { Option = "Payoyo goat's cheese" },
-                  new SurveyAnswer { Option = "Tortilla" },
-                  new SurveyAnswer { Option = "Jamón" },
-                  new SurveyAnswer { Option = "Jamón" },
-                  new SurveyAnswer { Option = "Jamón" }
-                }
-            },
+              Id = Guid.Parse("7e467e51-9999-427e-bf81-015076b9f24c"),
+              Title = "What's the best food in the world?",
+              ExpiresAt = DateTime.Now.AddMinutes(2),
+              Options = new List<string>{ "Cheese", "Payoyo goat's cheese", "Tortilla", "Jamón", "Soylent!" },
+              Answers = new List<SurveyAnswer>{
+                new SurveyAnswer { Option = "Cheese" },
+                new SurveyAnswer { Option = "Cheese" },
+                new SurveyAnswer { Option = "Payoyo goat's cheese" },
+                new SurveyAnswer { Option = "Payoyo goat's cheese" },
+                new SurveyAnswer { Option = "Payoyo goat's cheese" },
+                new SurveyAnswer { Option = "Payoyo goat's cheese" },
+                new SurveyAnswer { Option = "Tortilla" },
+                new SurveyAnswer { Option = "Jamón" },
+                new SurveyAnswer { Option = "Jamón" },
+                new SurveyAnswer { Option = "Jamón" }
+              }
+          },
         };
 
         public SurveyController(IHubContext<SurveyHub, ISurveyHub> surveyHub)
@@ -106,7 +106,7 @@ namespace BlazorSurveys.Server.Controllers
             // ofc sending the entire survey all the time is inefficient, but enough in this tutorial
             await this.hubContext.Clients.Group(surveyId.ToString()).SurveyUpdated(survey);
 
-            return new JsonResult(answer);
+            return new JsonResult(survey);
         }
     }
 }

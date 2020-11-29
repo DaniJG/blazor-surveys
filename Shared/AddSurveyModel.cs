@@ -16,17 +16,11 @@ namespace BlazorSurveys.Shared
         // and it is still in "experimental mode"
         // See https://docs.microsoft.com/en-us/aspnet/core/blazor/forms-validation?view=aspnetcore-5.0#nested-models-collection-types-and-complex-types
         [ValidateComplexType]
-        public List<OptionCreateModel> Options { get; set; } = new List<OptionCreateModel>();
+        public List<OptionCreateModel> Options { get; init; } = new List<OptionCreateModel>();
 
-        public void RemoveOption(OptionCreateModel option)
-        {
-            this.Options.Remove(option);
-        }
+        public void RemoveOption(OptionCreateModel option) => this.Options.Remove(option);
 
-        public void AddOption()
-        {
-            this.Options.Add(new OptionCreateModel());
-        }
+        public void AddOption() => this.Options.Add(new OptionCreateModel());
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
