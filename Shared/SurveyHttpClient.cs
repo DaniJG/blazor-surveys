@@ -29,7 +29,7 @@ namespace BlazorSurveys.Shared
 
         public async Task<HttpResponseMessage> AddSurvey(AddSurveyModel survey)
         {
-            return await this.http.PostAsJsonAsync<AddSurveyModel>("api/survey", survey);
+            return await this.http.PutAsJsonAsync<AddSurveyModel>("api/survey", survey);
         }
 
         public async Task<HttpResponseMessage> AnswerSurvey(Guid surveyId, SurveyAnswer answer)

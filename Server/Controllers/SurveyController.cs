@@ -75,7 +75,7 @@ namespace BlazorSurveys.Server.Controllers
 
         // Note an [ApiController] will automatically return a 400 response if any
         // of the data annotation valiadations defined in AddSurveyModel fails
-        [HttpPost()]
+        [HttpPut()]
         public async Task<Survey> AddSurvey([FromBody]AddSurveyModel addSurveyModel)
         {
             var survey = new Survey{
