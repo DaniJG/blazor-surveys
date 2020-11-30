@@ -38,6 +38,7 @@
     {
         survey = await SurveyHttpClient.GetSurvey(Id);
 
+        // TODO: error handling, for example connection with server lost
         await HubConnection.InvokeAsync("JoinSurveyGroup", Id);
 
         HubConnection.On<Survey>("SurveyUpdated", survey =>
@@ -50,6 +51,7 @@
     public async ValueTask DisposeAsync()
     {
         HubConnection.Remove("SurveyUpdated");
+        // TODO: error handling, for example connection with server lost
         await HubConnection.InvokeAsync("LeaveSurveyGroup", Id);
     }
 
