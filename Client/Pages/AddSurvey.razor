@@ -10,8 +10,8 @@
   @* Use the experimental ObjectGraphDataAnnotationsValidator which allows to validate complex nested models *@
   @* <DataAnnotationsValidator /> *@
   <ObjectGraphDataAnnotationsValidator />
-  <div class="@(editContext.GetValidationMessages().Any() ? "alert alert-danger" : "")">
-    <ValidationSummary class="alert alert-danger" />
+  <div class="@(editContext.GetValidationMessages().Any() ? "alert alert-danger pb-0" : "")">
+    <ValidationSummary />
   </div>
 
   <div class="form-group">
